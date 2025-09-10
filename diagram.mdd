@@ -1,0 +1,18 @@
+# CI/CD Pipeline Diagram
+
+```mermaid
+flowchart LR
+    Dev[Developer Computer] --> GH[GitHub Repo]
+    GH -->|PR Trigger| J[Jenkins Pipeline]
+    J -->|Build + Test| DI[Docker Image]
+    DI --> CR[(Container Registry)]
+
+    subgraph Deployment
+        CR --> K8s[Kubernetes Cluster]
+        GO[ArgoCD / Flux] -->|Sync Configs| K8s
+    end
+
+    K8s --> P[Prometheus]
+    P --> G[Grafana Dashboard]
+
+    GH -.->|Update YAMLs| GO
