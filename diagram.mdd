@@ -1,12 +1,18 @@
+# CI/CD Pipeline Architecture
+
+```mermaid
 flowchart LR
-  A[Developers<br/>GitHub] -->|Push PR| B[Jenkins CI]
-  B -->|Build & Unit Tests| C[Docker Image]
-  C -->|Push| D[(Container Registry)]
-  D --> E[Kubernetes Cluster]
-  subgraph GitOps
-    F[ArgoCD/Flux]
-  end
-  F -->|Sync Manifests| E
-  A -.->|Update Manifests| F
-  E --> G[Prometheus Metrics]
-  G --> H[Grafana Dashboards]
+    Dev[Developer Computer] --> GH[GitHub Repo]
+    GH -->|PR Trigger| J[Jenkins Pipeline]
+    J -->|Build + Test| DI[Docker Image]
+    DI --> CR[(Container Registry)]
+
+    subgraph Deployment
+        CR --> K8s[Kubernetes Cluster]
+        GO[ArgoCD / Flux] -->|Sync Configs| K8s
+    end
+
+    GH -.->|Update YAMLs| GO
+
+    K8s --> P[Prometheus]
+    P --> G[Grafana Dashboard]
